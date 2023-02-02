@@ -2,6 +2,7 @@ import {
   Button,
   Columns,
   Container,
+  IconButton,
   Muted,
   render,
   Text,
@@ -13,8 +14,36 @@ import { emit } from '@create-figma-plugin/utilities'
 import { h } from 'preact'
 import { useCallback, useState } from 'preact/hooks'
 
-import { CloseHandler, CreateMathHandler, CreatePlotHandler } from './types'
+import { CloseHandler, CreateMathHandler, CreatePlotHandler, CreateIntersectionPointHandler, CreateAngleBetweenLinesHandler } from './types'
 
+import { FiCrosshair } from 'react-icons/fi';
+import { RxAngle } from 'react-icons/rx';
+
+const plot = (equation: string) => `
+\\begin{tikzpicture}[scale=1.0544]
+  \\small
+  \\begin{axis} [
+      axis x line=center,
+      axis y line=center,
+      xlabel={$x$},
+      ylabel={$y$},
+      samples=240,
+      width=${10}cm, 
+      height=${10}cm,
+      xmin=${-5}, xmax=${5},
+      ymin=${-5}, ymax=${5},
+      restrict y to domain=${-5}:${5},
+      axis equal
+    ]
+  \\addplot[
+      black,
+      domain=${-5}:${5},
+      semithick
+    ]
+  {${equation}};
+\\end{axis}
+\\end{tikzpicture}
+`
 const Plugin = () => {
   const [equation, setEquation] = useState<string>('\\zeta (s) = \\sum_{n \\mathop = 1}^\\infty \\frac 1 {n^s}')
   const [size, setSize] = useState<number | null>(17)
@@ -46,7 +75,16 @@ const Plugin = () => {
 
   const handleCloseButtonClick = useCallback(() => {
     emit<CloseHandler>('CLOSE')
-  }, [])
+  }, []);
+
+  const handleCreateIntersectionPointButtonClick = useCallback(() => {
+    emit<CreateIntersectionPointHandler>('CREATE_INTERSECTION_POINT');
+  }, []);
+
+  const handleCreateAngleBetweenLinesButtonClick = useCallback(() => {
+    emit<CreateAngleBetweenLinesHandler>('CREATE_ANGLE_BETWEEN_LINES');
+  }, []);
+
   return (
     <Container space="medium">
       <VerticalSpace space="large" />
@@ -95,6 +133,22 @@ const Plugin = () => {
         Plot
       </Text>
       <VerticalSpace space="large" />
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '16px',
+          backgroundColor: 'white',
+        }}
+      >
+        <img
+          src={`https://tex.s2cms.ru/png/${encodeURI(plot(plotEquation || ''))}`}
+          style={{
+            width: '100%',
+          }}
+        />
+      </div>
+      <VerticalSpace space="large" />
       <Text>
         <Muted>Plot Equation</Muted>
       </Text>
@@ -116,6 +170,17 @@ const Plugin = () => {
           Close
         </Button>
       </Columns>
+      <VerticalSpace space="large" />
+      <Text>
+        <Muted>Angle</Muted>
+      </Text>
+      <VerticalSpace space="small" />
+      <IconButton onClick={handleCreateIntersectionPointButtonClick}>
+        <FiCrosshair size={16}/>
+      </IconButton>
+      <IconButton onClick={handleCreateAngleBetweenLinesButtonClick}>
+        <RxAngle size={16}/>
+      </IconButton>
       <VerticalSpace space="small" />
     </Container>
   )

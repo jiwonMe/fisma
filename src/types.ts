@@ -24,3 +24,13 @@ export interface CloseHandler extends EventHandler {
   name: 'CLOSE'
   handler: () => void
 }
+
+export interface CreateAngleBetweenLinesHandler extends EventHandler {
+  name: 'CREATE_ANGLE_BETWEEN_LINES'
+  handler: () => void
+}
+
+export interface CreateIntersectionPointHandler extends EventHandler {
+  name: 'CREATE_INTERSECTION_POINT'
+  handler: () => void
+}
