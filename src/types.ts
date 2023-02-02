@@ -34,3 +34,8 @@ export interface CreateIntersectionPointHandler extends EventHandler {
   name: 'CREATE_INTERSECTION_POINT'
   handler: () => void
 }
+
+export interface CreateTangentLineToCircleHandler extends EventHandler {
+  name: 'CREATE_TANGENT_LINE_TO_CIRCLE'
+  handler: () => void
+}

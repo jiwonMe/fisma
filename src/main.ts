@@ -1,5 +1,5 @@
 import { on, once, showUI } from '@create-figma-plugin/utilities'
-import { CloseHandler, CreateAngleBetweenLinesHandler, CreateIntersectionPointHandler, CreateMathHandler, CreatePlotHandler } from './types'
+import { CloseHandler, CreateAngleBetweenLinesHandler, CreateIntersectionPointHandler, CreateMathHandler, CreatePlotHandler, CreateTangentLineToCircleHandler } from './types'
 import parseSVGLine from './utils/parseSVGLine';
 
 const parseVectorPath = (vectorPath: VectorPath) => {
@@ -125,13 +125,6 @@ $$\\begin{tikzpicture}[scale=1.0544]
         return;
       }
 
-      // create circle at intersection point
-      // const circle = figma.createEllipse();
-      // circle.resize(4, 4);
-      // circle.fills = [{type: 'SOLID', color: {r: 0, g: 0, b: 0}}];
-      // circle.x = intersectionPoint[0] - 2;
-      // circle.y = intersectionPoint[1] - 2;
-
       const sector1 = figma.createEllipse();
       sector1.resize(10, 10);
       sector1.fills = [{type: 'SOLID', color: {r: 0, g: 0, b: 0}, opacity: 0}];
@@ -211,6 +204,79 @@ $$\\begin{tikzpicture}[scale=1.0544]
       circle.x = intersectionPoint[0] - 2;
       circle.y = intersectionPoint[1] - 2;
     }
+  })
+
+  on<CreateTangentLineToCircleHandler>('CREATE_TANGENT_LINE_TO_CIRCLE', () => {
+    let pointCircle: EllipseNode | null = null;
+    let objectCircle: EllipseNode | null = null;
+    if (figma.currentPage.selection.length !== 2) return;
+
+    let radiusObjCircle = 0;
+    figma.currentPage.selection.forEach((node) => {
+        if (node.type === 'ELLIPSE') {
+          const r = node.width / 2;
+          if (r > radiusObjCircle) {
+            radiusObjCircle = r;
+            objectCircle = node;
+          }
+        }
+      }
+    )
+    if (objectCircle === null) return;
+
+    figma.currentPage.selection.forEach((node) => {
+        if (node.type === 'ELLIPSE') {
+          if (node !== objectCircle) {
+            pointCircle = node;
+          }
+        }
+      }
+    )
+
+    if (pointCircle === null) return;
+
+    const centerPointCircle = [(pointCircle as EllipseNode).x + (pointCircle as EllipseNode).width / 2, (pointCircle as EllipseNode).y + (pointCircle as EllipseNode).height / 2];
+    const centerObjectCircle = [(objectCircle as EllipseNode).x + (objectCircle as EllipseNode).width / 2, (objectCircle as EllipseNode).y + (objectCircle as EllipseNode).height / 2];
+
+    const radiusPointCircle = (pointCircle as EllipseNode).width / 2;
+    const radiusObjectCircle = (objectCircle as EllipseNode).width / 2;
+
+    const distance = Math.sqrt(Math.pow(centerPointCircle[0] - centerObjectCircle[0], 2) + Math.pow(centerPointCircle[1] - centerObjectCircle[1], 2));
+    const angle = Math.atan2(centerPointCircle[1] - centerObjectCircle[1], centerPointCircle[0] - centerObjectCircle[0]);
+    
+    const tangentLine1 = figma.createVector();
+    const l1 = Math.sqrt(distance * distance - radiusObjectCircle * radiusObjectCircle);
+    tangentLine1.vectorPaths = [{
+      windingRule: 'EVENODD',
+      data: `M 0 0 L ${l1} 0`,
+    }];
+    tangentLine1.x = centerPointCircle[0];
+    tangentLine1.y = centerPointCircle[1];
+    tangentLine1.rotation = - (
+      angle * 180 / Math.PI + Math.asin(radiusObjectCircle / distance) * 180 / Math.PI
+    ) + 180;
+
+    tangentLine1.strokeWeight = 1;
+    tangentLine1.strokeAlign = 'CENTER';
+    tangentLine1.strokes = [{type: 'SOLID', color: {r: 0, g: 0, b: 0}}];
+
+    const tangentLine2 = figma.createVector();
+    const l2 = Math.sqrt(distance * distance - radiusObjectCircle * radiusObjectCircle);
+    tangentLine2.vectorPaths = [{
+      windingRule: 'EVENODD',
+      data: `M 0 0 L ${l2} 0`,
+    }];
+    tangentLine2.x = centerPointCircle[0];
+    tangentLine2.y = centerPointCircle[1];
+    tangentLine2.rotation = - (
+      angle * 180 / Math.PI - Math.asin(radiusObjectCircle / distance) * 180 / Math.PI
+    ) + 180;
+
+    tangentLine2.strokeWeight = 1;
+    tangentLine2.strokeAlign = 'CENTER';
+    tangentLine2.strokes = [{type: 'SOLID', color: {r: 0, g: 0, b: 0}}];
+
+
   })
 
   showUI({

@@ -14,10 +14,11 @@ import { emit } from '@create-figma-plugin/utilities'
 import { h } from 'preact'
 import { useCallback, useState } from 'preact/hooks'
 
-import { CloseHandler, CreateMathHandler, CreatePlotHandler, CreateIntersectionPointHandler, CreateAngleBetweenLinesHandler } from './types'
+import { CloseHandler, CreateMathHandler, CreatePlotHandler, CreateIntersectionPointHandler, CreateAngleBetweenLinesHandler, CreateTangentLineToCircleHandler } from './types'
 
 import { FiCrosshair } from 'react-icons/fi';
 import { RxAngle } from 'react-icons/rx';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 const plot = (equation: string) => `
 \\begin{tikzpicture}[scale=1.0544]
@@ -83,6 +84,10 @@ const Plugin = () => {
 
   const handleCreateAngleBetweenLinesButtonClick = useCallback(() => {
     emit<CreateAngleBetweenLinesHandler>('CREATE_ANGLE_BETWEEN_LINES');
+  }, []);
+
+  const handleCreateTangentLineToCircleButtonClick = useCallback(() => {
+    emit<CreateTangentLineToCircleHandler>('CREATE_TANGENT_LINE_TO_CIRCLE');
   }, []);
 
   return (
@@ -181,6 +186,10 @@ const Plugin = () => {
       <IconButton onClick={handleCreateAngleBetweenLinesButtonClick}>
         <RxAngle size={16}/>
       </IconButton>
+      <IconButton onClick={handleCreateTangentLineToCircleButtonClick}>
+        <AiOutlineLoading3Quarters size={16}/>
+      </IconButton>
+      <VerticalSpace space="small" />
       <VerticalSpace space="small" />
     </Container>
   )
