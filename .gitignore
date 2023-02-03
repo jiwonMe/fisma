@@ -22,5 +22,5 @@
 
 .DS_Store
 node_modules/
-build/
-manifest.json
+# build/
+# manifest.json

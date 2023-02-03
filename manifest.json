@@ -1,0 +1,10 @@
+{
+  "api": "1.0.0",
+  "editorType": [
+    "figma"
+  ],
+  "id": "fisma",
+  "name": "Fisma",
+  "main": "build/main.js",
+  "ui": "build/ui.js"
+}

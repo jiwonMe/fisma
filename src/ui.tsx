@@ -177,7 +177,7 @@ const Plugin = () => {
       </Columns>
       <VerticalSpace space="large" />
       <Text>
-        <Muted>Angle</Muted>
+        <Muted>Tools</Muted>
       </Text>
       <VerticalSpace space="small" />
       <IconButton onClick={handleCreateIntersectionPointButtonClick}>
